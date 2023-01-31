@@ -14,9 +14,18 @@ const App = () => {
 
   const [selected, setSelected] = useState(0)
 
+ 
+  const randAnecdote = () => {
+    let rand_num = Math.floor((Math.random() * 7) + 1);; //Return a random whole number between 0 and 7
+    setSelected(rand_num)
+  }
+
   return (
     <div>
-      {anecdotes[selected]}
+      <div>{anecdotes[selected]}</div>
+      <button onClick={randAnecdote}>
+        Next Anecdote
+      </button>
     </div>
   )
 }
