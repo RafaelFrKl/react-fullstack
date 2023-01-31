@@ -14,21 +14,28 @@ const App = () => {
 
   const [selected, setSelected] = useState(0)
   const [voteArr, setVoteArr] = useState(new Uint8Array(8)) //zero filled array of length 8
+  const [mostVoted, setMostVoted] = useState(0)
 
   const vote = () => {
     const copy = [...voteArr] //copy contents of Vote array into a new array 
     copy[selected] += 1   // increment the value in position selected by 1
     setVoteArr(copy) 
     console.log(voteArr)
+
+    if (copy[selected] > copy[mostVoted]){
+      setMostVoted(selected)
+    }
+    
   }
 
   const randAnecdote = () => {
-    let rand_num = Math.floor((Math.random() * 7) + 1);; //Return a random whole number between 0 and 7
+    let rand_num = Math.floor((Math.random() * 8));; //Return a random whole number between 0 and 7
     setSelected(rand_num)
   }
-  
+
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <div>{anecdotes[selected]}</div>
       <div>Has {voteArr[selected]} votes</div>
       <button onClick={vote}>
@@ -37,6 +44,9 @@ const App = () => {
       <button onClick={randAnecdote}>
         Next Anecdote
       </button>
+      <h1>Anecdote with the most votes</h1>
+      <div>{anecdotes[mostVoted]}</div>
+      <div>Has {voteArr[mostVoted]} votes</div>
     </div>
   )
 }
