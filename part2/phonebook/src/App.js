@@ -1,19 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import axios from 'axios'
 
+//The callback function now takes the data contained within the response, stores it in a variable, and prints the notes to the console
+axios
+  .get('http://localhost:3001/persons')
+  .then(response => {
+    const persons = response.data
+    console.log(persons)
+  })
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456'},
-    { name: 'Ada Lovelace', number: '39-44-5323523'},
-    { name: 'Dan Abramov', number: '12-43-234345'},
-    { name: 'Mary Poppendieck', number: '39-23-6423122'}
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+
+  //Effect-hook: By default, effects run after every completed render, but you can choose to fire it only when certain values have changed.
+  useEffect(() => {
+    console.log('effect')
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('promise fulfilled')
+        setPersons(response.data)
+      })
+  }, []) // If the second parameter is an empty array [], then the effect is only run along with the first render of the component.
 
   const addPerson = (event) => { //Form Submit
     event.preventDefault()
