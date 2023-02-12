@@ -1,6 +1,8 @@
-const Person = ({ person }) => {
+import Button from './Button'
+
+const Person = ({ person, deletePerson }) => {
     return (
-        <div>{person.name} {person.number}</div>
+        <div>{person.name} {person.number} <Button handleClick={() => deletePerson(person.id)} text="delete" /></div>
     )
 }
 
