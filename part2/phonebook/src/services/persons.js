@@ -20,4 +20,4 @@ const remove = (id) => {
     return axios.delete(`${baseUrl}/${id}`)
 }
 
-export default { getAll, create, update, remove } //Cleaner Syntax for Defining Object Literals
+export default { getAll, create, update, remove }

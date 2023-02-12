@@ -1,87 +1,64 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import personService from './services/persons'
 import Notification from './components/Notification'
-
-//The callback function now takes the data contained within the response, stores it in a variable, and prints the notes to the console
-axios
-  .get('http://localhost:3001/persons')
-  .then(response => {
-    const persons = response.data
-    console.log(persons)
-  })
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
-  const [newFilter, setNewFilter] = useState('')
-  const [message, setMessage] = useState(null)
-  const [error, setError] = useState(false)
+  const [filter, setFilter] = useState('')
+  const [notification, setNotification] = useState(null)
 
-//Effect-hook: By default, effects run after every completed render, but you can choose to fire it only when certain values have changed.
   useEffect(() => {
-    personService
-      .getAll()
-      .then(initialNotes => {
-        setPersons(initialNotes)
-      })
-  }, []) // If the second parameter is an empty array [], then the effect is only run along with the first render of the component.
+    personService.getAll().then(persons => {
+      setPersons(persons)
+    })
+  }, [])
 
-  const addPerson = (event) => { //Form Submit
+  const notify = (message, type = 'info') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 3000)
+  }
+
+  const addPerson = (event) => {
     event.preventDefault()
-    const personObject = {
+    const newPerson = {
       name: newName,
-      number: newNumber,
+      number: newNumber
     }
 
-    let duplicate = persons.find(p => p.name === newName) //checks if the new name is a duplicate by searching persons array of objects 
-    if (duplicate){ //If dupliucate exists, throw warning
-      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        const changedPerson = { ...duplicate, number: newNumber } //we create a new object that is an exact copy of the old note, apart from the important property that has the value flipped (from true to false or from false to true)
+    setNewName('')
+    setNewNumber('')
 
-        personService
-          .update(duplicate.id, changedPerson)
-          .then(returnedPerson => {
-            //The map method creates a new array by mapping every item from the old array into an item in the new array. In our example, the new array is created conditionally so that if note.id !== id is true; we simply copy the item from the old array into the new array. If the condition is false, then the note object returned by the server is added to the array instead.
-            setPersons(persons.map(person => person.id !== duplicate.id ? person : returnedPerson))
-            setMessage(
-              `Changed ${returnedPerson.name}'s number`
-            )
-            setError(false)
-            setTimeout(() => {
-              setMessage(null)
-            }, 2500)
-          }).catch(error => {
-            setMessage(
-              `${duplicate.name} was already deleted from server`
-            )
-            setError(true)
-            setTimeout(() => {
-              setMessage(null)
-            }, 3000)
-            setPersons(persons.filter(p => p.id !== duplicate.id))
-          })
-      }
-    } else{
-      personService
-        .create(personObject)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson)) //new Name added to our Persons array via a new copy
-          setMessage(
-            `Added ${returnedPerson.name}`
-          )
-          setError(false)
-          setTimeout(() => {
-            setMessage(null)
-          }, 3000)
+    const existingPerson = persons.find(p => p.name === newPerson.name)
+    if (existingPerson) {
+      const ok = window.confirm(`${existingPerson.name} is already added to phonebook, update the number?`)
+      if (ok) {
+
+        personService.update(existingPerson.id, { ...existingPerson, number: newNumber }).then(savedPerson => {
+          setPersons(persons.map(p => p.id === existingPerson.id ? savedPerson : p))
+          notify(`Updated info of ${savedPerson.name}`)
         })
+          .catch(error => {
+            notify(
+              `the person '${existingPerson.name}' was had already been from the server`, 'alert'
+            )
+            setPersons(persons.filter(p => p.id !== existingPerson.id))
+          })
+
+        return
+      }
     }
-    setNewName('') //resets the value of the controlled input element 
-    setNewNumber('') //resets the value of the controlled input element
+
+    personService.create(newPerson).then(savedPerson => {
+      setPersons(persons.concat(savedPerson))
+      notify(`Added ${savedPerson.name}`)
+    })
   }
 
   const deletePerson = (id) => {
@@ -90,53 +67,36 @@ const App = () => {
     if (ok) {
       personService.remove(id).then(() => {
         setPersons(persons.filter(p => p.id !== id))
-        setMessage(`Deleted ${toDelete.name}`)
-        setError(false)
+        notify(`Deleted ${toDelete.name}`)
       })
     }
   }
 
-  const handleNameChange = (event) => {
-    console.log(event.target.value)
-    setNewName(event.target.value)
-  }
-
-  const handleNumberChange = (event) => {
-    console.log(event.target.value)
-    setNewNumber(event.target.value)
-  }
-
-
-  const handleFilterChange = (event) => {
-    console.log(event.target.value)
-    setNewFilter(event.target.value)
-  }
-  
-  //const result = condition ? val1 : val2 
-  //result is set to value of val1 if condition is True. 
-  //result is set to value of val2 if condition is False.
-  //Filters by names containing substring
-  const personsToShow = newFilter === '' ? persons
-    : persons.filter(p => p.name.toLowerCase().includes(newFilter))
-  //console.log("log: ", personsToShow)
+  const personsToShow = (filter.length === 0) ? persons :
+    persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} error={error} />
-      <Filter filter={newFilter} handleFilterChange={handleFilterChange} />
-      <h3>Add a New Person</h3>
-      <PersonForm 
-        addPerson={addPerson}
+      <Notification notification={notification} />
+      <Filter
+        value={filter}
+        handleChange={({ target }) => setFilter(target.value)}
+      />
+      <PersonForm
         name={newName}
         number={newNumber}
-        handleNameChange={handleNameChange}
-        handleNumberChange={handleNumberChange}
+        handleNameChange={({ target }) => setNewName(target.value)}
+        handleNumberChange={({ target }) => setNewNumber(target.value)}
+        addPerson={addPerson}
       />
-      <h3>Numbers</h3>
-      <Persons persons={personsToShow} handleDelete={deletePerson} />
+      <Persons
+        persons={personsToShow}
+        handleDelete={deletePerson}
+      />
     </div>
   )
+
 }
 
 export default App
