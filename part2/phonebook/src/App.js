@@ -38,7 +38,21 @@ const App = () => {
 
     let duplicate = persons.find(p => p.name === newName) //checks if the new name is a duplicate by searching persons array of objects 
     if (duplicate){ //If dupliucate exists, throw warning
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const changedPerson = { ...duplicate, number: newNumber } //we create a new object that is an exact copy of the old note, apart from the important property that has the value flipped (from true to false or from false to true)
+
+        personService
+          .update(duplicate.id, changedPerson)
+          .then(returnedPerson => {
+            //The map method creates a new array by mapping every item from the old array into an item in the new array. In our example, the new array is created conditionally so that if note.id !== id is true; we simply copy the item from the old array into the new array. If the condition is false, then the note object returned by the server is added to the array instead.
+            setPersons(persons.map(person => person.id !== duplicate.id ? person : returnedPerson))
+          }).catch(error => {
+            alert(
+              `the Person '${duplicate.name}' was already deleted from server`
+            )
+            setPersons(persons.filter(p => p.id !== duplicate.id))
+          })
+      }
     } else{
       personService
         .create(personObject)
@@ -50,11 +64,27 @@ const App = () => {
     setNewNumber('') //resets the value of the controlled input element
   }
 
-  const deletePerson = id => {
-    console.log("Hello There: ", id)
-    
+  const updatePerson = id => {
     const person = persons.find(p => p.id === id) //The array find method is used to find the note we want to modify
-    console.log("Hello There: ", person)
+    const changedPerson = { ...person, important: !person.important } //we create a new object that is an exact copy of the old note, apart from the important property that has the value flipped (from true to false or from false to true)
+
+    personService
+      .update(id, changedPerson)
+      .then(returnedPerson => {
+        //The map method creates a new array by mapping every item from the old array into an item in the new array. In our example, the new array is created conditionally so that if note.id !== id is true; we simply copy the item from the old array into the new array. If the condition is false, then the note object returned by the server is added to the array instead.
+        setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
+      }).catch(error => {
+        alert(
+          `the Person '${person.name}' was already deleted from server`
+        )
+        setPersons(persons.filter(p => p.id !== id))
+      })
+  }
+
+  const deletePerson = id => {
+    //console.log("Hello There: ", id)
+    const person = persons.find(p => p.id === id) //The array find method is used to find the note we want to modify
+    //console.log("Hello There: ", person)
 
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
