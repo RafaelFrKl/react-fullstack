@@ -1,11 +1,14 @@
-import Person from './Person'
-
-const Persons = ({ persons, deletePerson }) => {
+const Persons = ({ persons, handleDelete }) => {
     return (
         <>
             {persons.map(person =>
-                <Person key={person.id} person={person} deletePerson={deletePerson} />
-            )}
+                <p key={person.id}>
+                    {person.name} {person.number}
+                    <button onClick={() => handleDelete(person.id)}>
+                        delete
+                    </button>
+                </p>
+                )}
             
         </>
     )

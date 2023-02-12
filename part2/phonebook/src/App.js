@@ -84,27 +84,15 @@ const App = () => {
     setNewNumber('') //resets the value of the controlled input element
   }
 
-  const deletePerson = id => {
-    //console.log("Hello There: ", id)
-    const person = persons.find(p => p.id === id) //The array find method is used to find the note we want to modify
-    //console.log("Hello There: ", person)
-
-    if (window.confirm(`Delete ${person.name}?`)) {
-      personService
-        .deletes(id)
-        .then(returnedPerson => {
-          //The map method creates a new array by mapping every item from the old array into an item in the new array. In our example, the new array is created conditionally so that if note.id !== id is true; we simply copy the item from the old array into the new array. If the condition is false, then the note object returned by the server is added to the array instead.
-          setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
-        }).catch(error => {
-          setMessage(
-            `${person.name} was already deleted from server`
-          )
-          setError(true)
-          setTimeout(() => {
-            setMessage(null)
-          }, 3000)
-          setPersons(persons.filter(p => p.id !== id))
-        })
+  const deletePerson = (id) => {
+    const toDelete = persons.find(p => p.id === id)
+    const ok = window.confirm(`Delete ${toDelete.name}`)
+    if (ok) {
+      personService.remove(id).then(() => {
+        setPersons(persons.filter(p => p.id !== id))
+        setMessage(`Deleted ${toDelete.name}`)
+        setError(false)
+      })
     }
   }
 
@@ -146,7 +134,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h3>Numbers</h3>
-      <Persons persons={personsToShow} deletePerson={deletePerson} />
+      <Persons persons={personsToShow} handleDelete={deletePerson} />
     </div>
   )
 }
