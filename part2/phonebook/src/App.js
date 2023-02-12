@@ -20,6 +20,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
   const [message, setMessage] = useState(null)
+  const [error, setError] = useState(false)
 
 //Effect-hook: By default, effects run after every completed render, but you can choose to fire it only when certain values have changed.
   useEffect(() => {
@@ -50,13 +51,18 @@ const App = () => {
             setMessage(
               `Changed ${returnedPerson.name}'s number`
             )
+            setError(false)
             setTimeout(() => {
               setMessage(null)
             }, 2500)
           }).catch(error => {
-            alert(
-              `the Person '${duplicate.name}' was already deleted from server`
+            setMessage(
+              `${duplicate.name} was already deleted from server`
             )
+            setError(true)
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
             setPersons(persons.filter(p => p.id !== duplicate.id))
           })
       }
@@ -68,9 +74,10 @@ const App = () => {
           setMessage(
             `Added ${returnedPerson.name}`
           )
+          setError(false)
           setTimeout(() => {
             setMessage(null)
-          }, 2500)
+          }, 3000)
         })
     }
     setNewName('') //resets the value of the controlled input element 
@@ -89,9 +96,13 @@ const App = () => {
           //The map method creates a new array by mapping every item from the old array into an item in the new array. In our example, the new array is created conditionally so that if note.id !== id is true; we simply copy the item from the old array into the new array. If the condition is false, then the note object returned by the server is added to the array instead.
           setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
         }).catch(error => {
-          alert(
-            `the note '${person.content}' was already deleted from server`
+          setMessage(
+            `${person.name} was already deleted from server`
           )
+          setError(true)
+          setTimeout(() => {
+            setMessage(null)
+          }, 3000)
           setPersons(persons.filter(p => p.id !== id))
         })
     }
@@ -124,7 +135,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} error={error} />
       <Filter filter={newFilter} handleFilterChange={handleFilterChange} />
       <h3>Add a New Person</h3>
       <PersonForm 
