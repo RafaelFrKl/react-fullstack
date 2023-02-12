@@ -4,7 +4,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
-
+import Notification from './components/Notification'
 
 //The callback function now takes the data contained within the response, stores it in a variable, and prints the notes to the console
 axios
@@ -19,6 +19,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [message, setMessage] = useState(null)
 
 //Effect-hook: By default, effects run after every completed render, but you can choose to fire it only when certain values have changed.
   useEffect(() => {
@@ -46,6 +47,12 @@ const App = () => {
           .then(returnedPerson => {
             //The map method creates a new array by mapping every item from the old array into an item in the new array. In our example, the new array is created conditionally so that if note.id !== id is true; we simply copy the item from the old array into the new array. If the condition is false, then the note object returned by the server is added to the array instead.
             setPersons(persons.map(person => person.id !== duplicate.id ? person : returnedPerson))
+            setMessage(
+              `Changed ${returnedPerson.name}'s number`
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 2500)
           }).catch(error => {
             alert(
               `the Person '${duplicate.name}' was already deleted from server`
@@ -58,27 +65,16 @@ const App = () => {
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson)) //new Name added to our Persons array via a new copy
+          setMessage(
+            `Added ${returnedPerson.name}`
+          )
+          setTimeout(() => {
+            setMessage(null)
+          }, 2500)
         })
     }
     setNewName('') //resets the value of the controlled input element 
     setNewNumber('') //resets the value of the controlled input element
-  }
-
-  const updatePerson = id => {
-    const person = persons.find(p => p.id === id) //The array find method is used to find the note we want to modify
-    const changedPerson = { ...person, important: !person.important } //we create a new object that is an exact copy of the old note, apart from the important property that has the value flipped (from true to false or from false to true)
-
-    personService
-      .update(id, changedPerson)
-      .then(returnedPerson => {
-        //The map method creates a new array by mapping every item from the old array into an item in the new array. In our example, the new array is created conditionally so that if note.id !== id is true; we simply copy the item from the old array into the new array. If the condition is false, then the note object returned by the server is added to the array instead.
-        setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
-      }).catch(error => {
-        alert(
-          `the Person '${person.name}' was already deleted from server`
-        )
-        setPersons(persons.filter(p => p.id !== id))
-      })
   }
 
   const deletePerson = id => {
@@ -128,6 +124,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter filter={newFilter} handleFilterChange={handleFilterChange} />
       <h3>Add a New Person</h3>
       <PersonForm 
