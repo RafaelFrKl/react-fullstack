@@ -1,0 +1,7 @@
+Post http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+    "contet": "VS Code is cool",
+    "important": true
+}
