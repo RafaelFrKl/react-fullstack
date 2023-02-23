@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
+const cors = require('cors') // Cors Middleware
 
 app.use(express.json()) // add New Notes: HTTP POST requests
+app.use(cors()) // Cors Middleware
 
 let notes = [
     {
@@ -89,7 +91,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = 3001
+const PORT = process.env.PORT || 10000
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
