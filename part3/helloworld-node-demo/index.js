@@ -4,6 +4,7 @@ const cors = require('cors') // Cors Middleware
 
 app.use(express.json()) // add New Notes: HTTP POST requests
 app.use(cors()) // Cors Middleware
+app.use(express.static('build')) //whenever express gets an HTTP GET request it will first check if the build directory contains a file corresponding to the request's address. If a correct file is found, express will return it.
 
 let notes = [
     {
