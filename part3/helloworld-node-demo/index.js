@@ -53,12 +53,8 @@ app.get('/api/notes/:id', (request, response, next) => {
 })
 
 // 4. Create New Note
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
     const body = request.body
-
-    if (body.content === undefined) {
-        return response.status(400).json({ error: 'content missing' })
-    }
 
     const note = new Note({
         content: body.content,
@@ -68,18 +64,18 @@ app.post('/api/notes', (request, response) => {
     note.save().then(savedNote => {
         response.json(savedNote)
     })
+    .catch(error => next(error))
 })
 
 // 5. Update Note
 app.put('/api/notes/:id', (request, response, next) => {
-    const body = request.body
+    const { content, important } = request.body
 
-    const note = {
-        content: body.content,
-        important: body.important,
-    }
-
-    Note.findByIdAndUpdate(request.params.id, note, { new: true }) //new: true parameter, causes event handler to be called with the new modified document instead of original
+    Note.findByIdAndUpdate(
+        request.params.id,
+        { content, important },
+        { new: true, runValidators: true, context: 'query' }
+    )
         .then(updatedNote => {
             response.json(updatedNote)
         })
@@ -107,6 +103,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') { //content validation
+        return response.status(400).json({ error: error.message })
     }
     next(error)
 }
