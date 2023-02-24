@@ -1,6 +1,8 @@
+require('dotenv').config() //used for sensitive info
 const express = require('express')
 const app = express()
 const cors = require('cors') // Cors Middleware
+const Note = require('./models/note') //MongoDB Model
 
 app.use(express.json()) // add New Notes: HTTP POST requests
 app.use(cors()) // Cors Middleware
@@ -33,7 +35,9 @@ app.get('/', (request, response) => {
 
 // 2. Defines an event handler that handles HTTP GET requests made to the notes path of the application:
 app.get('/api/notes', (request, response) => {
-    response.json(notes)
+    Note.find({}).then(notes => {
+        response.json(notes)
+    })
 })
 
 // 3. Fetch an individual resource
@@ -92,7 +96,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
