@@ -58,6 +58,10 @@ const App = () => {
     personService.create(newPerson).then(savedPerson => {
       setPersons(persons.concat(savedPerson))
       notify(`Added ${savedPerson.name}`)
+    }).catch(error => {
+      // this is the way to access the error message from backend
+      console.log(error.response.data.error)
+      notify(error.response.data.error, 'alert')
     })
   }
 
