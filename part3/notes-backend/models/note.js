@@ -1,3 +1,4 @@
+//Defines the Mongoose schema for notes
 const mongoose = require('mongoose')
 
 const noteSchema = new mongoose.Schema({

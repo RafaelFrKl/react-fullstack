@@ -1,3 +1,4 @@
+// Event handlers of routes
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
 
