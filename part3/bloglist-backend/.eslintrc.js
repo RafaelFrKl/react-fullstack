@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 module.exports = {
     'env': {
         'node': true,
@@ -14,7 +15,7 @@ module.exports = {
     'rules': {
         'indent': [
             'error',
-            2
+            4
         ],
         'quotes': [
             'error',
