@@ -14,6 +14,7 @@ const initialNotes = [
   },
 ]
 
+// Using await is possible only inside of an async function
 beforeEach(async () => {
   await Note.deleteMany({})
   let noteObject = new Note(initialNotes[0])
@@ -46,6 +47,44 @@ test('the first note is about HTTP methods', async () => {
   )
 }, 100000)
 
+test('a valid note can be added', async () => {
+  const newNote = {
+    content: 'async/await simplifies making async calls',
+    important: true,
+  }
+
+  await api
+    .post('/api/notes')
+    .send(newNote)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/notes')
+
+  const contents = response.body.map(r => r.content)
+
+  expect(response.body).toHaveLength(initialNotes.length + 1)
+  expect(contents).toContain(
+    'async/await simplifies making async calls'
+  )
+}, 100000)
+
+test('note without content is not added', async () => {
+  const newNote = {
+    important: true
+  }
+
+  await api
+    .post('/api/notes')
+    .send(newNote)
+    .expect(400)
+
+  const response = await api.get('/api/notes')
+
+  expect(response.body).toHaveLength(initialNotes.length)
+}, 100000)
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
+
