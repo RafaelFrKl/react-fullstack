@@ -1,6 +1,6 @@
 post http://localhost:3001/api/notes
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlc3RVc2VyIiwiaWQiOiI2M2ZkMDQwZjE5MzFiNjVmMjdkZGY5MDQiLCJpYXQiOjE2Nzc1MjcwMjl9.7Mp4icciYANE0QNX2csKUe210gEb0tyLB9v6DUS_4GI
+Authorization: Bearer <token after login> 
 
 {
     "content": "Track those calories",
