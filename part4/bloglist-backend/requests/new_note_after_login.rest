@@ -1,0 +1,8 @@
+post http://localhost:3001/api/notes
+Content-Type: application/json
+Authorization: Bearer <token after login> 
+
+{
+    "content": "Track those calories",
+    "important": true
+}
