@@ -1,16 +1,16 @@
 //Defines the Mongoose schema for notes
 const mongoose = require('mongoose')
 
-const blogSchema = new mongoose.Schema({
+const schema = mongoose.Schema({
     title: {
         type: String,
         required: true
     },
-    author: String,
-    url: {
+    author: {
         type: String,
         required: true
     },
+    url: String,
     likes: Number,
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -18,7 +18,7 @@ const blogSchema = new mongoose.Schema({
     }
 })
 
-blogSchema.set('toJSON', {
+schema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id
@@ -26,4 +26,4 @@ blogSchema.set('toJSON', {
     }
 })
 
-module.exports = mongoose.model('Blog', blogSchema)
+module.exports = mongoose.model('Blog', schema)

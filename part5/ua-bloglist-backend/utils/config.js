@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 require('dotenv').config()
 
 const PORT = process.env.PORT

@@ -30,6 +30,6 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "globalTeardown": "./test-teardown.js"
+    "globalTeardown": "./tests/teardown.js"
   }
 }
