@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -46,7 +47,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setErrorMessage('Wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -77,12 +78,14 @@ const App = () => {
         setNewAuthor('')
         setNewUrl('')
       })
+    setErrorMessage(`New blog ${newTitle} by ${newAuthor} successfully added`)
   }
  
   if (user === null) {
     return (
       <div>
         <h2>Log into Application</h2>
+        <Notification message={errorMessage} />
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -111,6 +114,7 @@ const App = () => {
   return (
     <div>
       <h2>Blogs</h2>
+      <Notification message={errorMessage} />
       
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
       
