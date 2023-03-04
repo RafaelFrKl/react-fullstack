@@ -2,9 +2,13 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [newTitle, setNewTitle] = useState('')
+  const [newAuthor, setNewAuthor] = useState('')
+  const [newUrl, setNewUrl] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
 
   const [username, setUsername] = useState('')
@@ -49,6 +53,31 @@ const App = () => {
     }
   }
 
+  const handleLogout = async (event) => {
+    // Delets logged in User from local storage
+    window.localStorage.removeItem('loggedNoteappUser')
+    // reload page
+    window.location.reload();
+  }
+
+  const addBlog = (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl,
+      likes: 0
+    }
+    console.log(blogObject);
+    blogService
+      .create(blogObject)
+      .then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        setNewTitle('')
+        setNewAuthor('')
+        setNewUrl('')
+      })
+  }
  
   if (user === null) {
     return (
@@ -82,8 +111,19 @@ const App = () => {
   return (
     <div>
       <h2>Blogs</h2>
-
-      <p>{user.name} logged in</p>
+      
+      <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+      
+      <h2>Create new blog</h2>
+      <BlogForm
+        title={newTitle}
+        author={newAuthor}
+        url={newUrl}
+        handleTitleChange={({ target }) => setNewTitle(target.value)}
+        handleAuthorChange={({ target }) => setNewAuthor(target.value)}
+        handleUrlChange={({ target }) => setNewUrl(target.value)}
+        addBlog={addBlog}
+      />
 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
