@@ -58,7 +58,7 @@ const App = () => {
   }
 
   const handleLogout = async (event) => {
-    // Delets logged in User from local storage
+    // Deletes logged in User from local storage
     window.localStorage.removeItem('loggedNoteappUser')
     // reload page
     window.location.reload();
