@@ -1,0 +1,27 @@
+### Create User
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "name": "TestUser",
+    "password": "testpass"
+}
+
+### Get All Users
+GET http://localhost:3003/api/users
+Content-Type: application/json
+
+### Get individual User
+GET http://localhost:3003/api/users/6488a383f1098caa1d422d3e
+Content-Type: application/json
+
+### Test - Update User
+PUT http://localhost:3003/api/users/6488a383f1098caa1d422d3e
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "name": "Test",
+    "password": "testpass"
+}
