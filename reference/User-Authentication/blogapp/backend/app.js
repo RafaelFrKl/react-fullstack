@@ -10,6 +10,12 @@ const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 
+//For Testing Only
+if (process.env.NODE_ENV === 'test') {
+    const testingRouter = require('./controllers/testing')
+    app.use('/api/testing', testingRouter)
+}
+
 const middleware = require('./utils/middleware')
 
 mongoose.set('strictQuery', false)

@@ -27,10 +27,12 @@ router.post('/', userExtractor, async (request, response) => {
 
     blog.user = user._id
 
-    const createdBlog = await blog.save()
+    let createdBlog = await blog.save()
 
     user.blogs = user.blogs.concat(createdBlog._id)
     await user.save()
+
+    createdBlog = await Blog.findById(createdBlog._id).populate('user')
 
     response.status(201).json(createdBlog)
 })
@@ -38,7 +40,9 @@ router.post('/', userExtractor, async (request, response) => {
 router.put('/:id', async (request, response) => {
     const { title, url, author, likes } = request.body
 
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, { title, url, author, likes }, { new: true })
+    let updatedBlog = await Blog.findByIdAndUpdate(request.params.id,  { title, url, author, likes }, { new: true })
+
+    updatedBlog = await Blog.findById(updatedBlog._id).populate('user')
 
     response.json(updatedBlog)
 })
@@ -52,7 +56,7 @@ router.delete('/:id', userExtractor, async (request, response) => {
         return response.status(401).json({ error: 'operation not permitted' })
     }
 
-    user.blogs = user.blogs.filter(b => b.toString() !== blog.id.toString())
+    user.blogs = user.blogs.filter(b => b.toString() !== blog.id.toString() )
 
     await user.save()
     await blog.remove()
