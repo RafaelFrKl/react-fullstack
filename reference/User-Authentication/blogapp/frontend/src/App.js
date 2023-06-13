@@ -75,7 +75,6 @@ const App = () => {
             notifyWith(`The blog' ${blog.title}' by '${blog.author} removed`)
             setBlogs(blogs.filter(b => b.id !== blog.id))
         }
-
     }
 
     if (!user) {
