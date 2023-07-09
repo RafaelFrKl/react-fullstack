@@ -1,0 +1,16 @@
+version: '3.9'
+services:       
+  app:                            # The name of the service, can be anything
+    image: rafaelfk/recipe-app    # Declares which image to use
+    build: .                      # Declares where to build if image is not found
+    ports:                        # Declares the ports to publish
+      - 3001:3001
+  mongodb:                        # The name of the service, can be anything
+    image: mongo                  # Declares which image to use
+    ports:                        # Declares the ports to publish
+      - 3456:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root        # Create a new user in the admin authentication database and given the role of root
+      MONGO_INITDB_ROOT_PASSWORD: example     # Set User's Password
+      MONGO_INITDB_DATABASE: the_database     # Create a database with that name
+
